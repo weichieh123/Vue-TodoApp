@@ -3,47 +3,51 @@
     <div class="modal-container" @click.self="$emit('toggle')">
         <div class="modal-header">{{title}}</div>
         <div class="modal-body">
-          <input
-            type="text"
-            :ref="modalref"
-            v-bind:value="this.targetTask"
-            v-on:input="updateTask($event.target.value)"           
-            @keyup.enter="$emit('submit',submitTarget($event))"
-            placeholder="What you want to do?"
-          />
-        <div class="dropdown d-inline">
-          <button
-            id="nowStatusBtn"
-            class="btn btn-outline-info dropdown-toggle ml-1"
-            type="button"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            {{this.nowStatus}}
-          </button>
-          <div class="dropdown-menu" aria-labelledby="fiterStatusBtn">
-            <a
-              class="dropdown-item"
-              value="todo"
-              @click="updateStatus('todo')"
-              >Todo</a
-            >
-            <a
-              class="dropdown-item"
-              value="inProgress"
-              @click="updateStatus('inProgress')"
-              >in Progress</a
-            >
-            <a
-              class="dropdown-item"
-              value="completed"
-              @click="updateStatus('completed')"
-              >Completed</a
-            >
+          <div class="col-12 d-flex align-items-center justify-content-between">
+            <input
+              type="text"
+              :ref="modalref"
+              v-bind:value="this.targetTask"
+              v-on:input="updateTask($event.target.value)"           
+              @keyup.enter="$emit('submit',submitTarget($event))"
+              placeholder="What you want to do?"
+            />
+            <div class="dropdown d-inline">
+              <button
+                id="nowStatusBtn"
+                class="btn btn-outline-info dropdown-toggle ml-1"
+                type="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {{this.nowStatus}}
+              </button>
+              <div class="dropdown-menu" aria-labelledby="fiterStatusBtn">
+                <a
+                  class="dropdown-item"
+                  value="todo"
+                  @click="updateStatus('todo')"
+                  >Todo</a
+                >
+                <a
+                  class="dropdown-item"
+                  value="inProgress"
+                  @click="updateStatus('inProgress')"
+                  >in Progress</a
+                >
+                <a
+                  class="dropdown-item"
+                  value="completed"
+                  @click="updateStatus('completed')"
+                  >Completed</a
+                >
+              </div>
+            </div>
           </div>
-        </div>
-        <small>press 'enter' to submit your task</small>
+          <div class="col-12">
+            <small class="w-100">press 'enter' to submit your task</small>
+          </div>
       </div>
     </div>
   </div>
@@ -93,6 +97,11 @@ export default {
 </script>
 <style lang="scss" scoped>
   input[type="text"] {
-    width: 70%;
+    width: 340px;
+  }
+  #nowStatusBtn {
+    height: 40px;
+    width: 120px;
+    // margin: 5px 0;
   }
 </style>
