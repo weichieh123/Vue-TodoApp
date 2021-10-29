@@ -227,8 +227,9 @@ export default {
     };
   },
   methods: {
-    setPages() {
-      let numOfPages = Math.ceil(this.tasks.length / this.perPage);
+    setPages(tasks) {
+      this.pages = [];
+      let numOfPages = Math.ceil(tasks.length / this.perPage);
       for (let i = 1; i <= numOfPages; i++) {
         this.pages.push(i);
       }
@@ -353,6 +354,7 @@ export default {
         case "todo":
           this.filteredTasks = this.tasks.filter((task) => !task.inProgress);
           this.filteredStatus = "Todo";
+          this.setPages(this.filteredTasks);
           this.displayTasks();
           break;
         case "inProgress":
@@ -360,16 +362,19 @@ export default {
             (task) => task.inProgress && !task.completed
           );
           this.filteredStatus = "in Progress";
+          this.setPages(this.filteredTasks);
           this.displayTasks();
           break;
         case "completed":
           this.filteredTasks = this.tasks.filter((task) => task.completed);
           this.filteredStatus = "Completed";
+          this.setPages(this.filteredTasks);
           this.displayTasks();
           break;
         default:
           this.filteredTasks = [...this.tasks];
           this.filteredStatus = "All";
+          this.setPages(this.filteredTasks);
           this.displayTasks();
       }
     },
@@ -398,7 +403,7 @@ export default {
   },
   created() {
     this.pages = [];
-    this.setPages();
+    this.setPages(this.tasks);
     this.displayTasks();
   },
   components: {
