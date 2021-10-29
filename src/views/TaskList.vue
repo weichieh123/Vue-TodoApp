@@ -264,6 +264,7 @@ export default {
       this.filteredTasks = this.tasks.filter((task) =>
         task.title.toLowerCase().includes(this.search.toLowerCase())
       );
+      this.setPages(this.filteredTasks);
     },
     updateStatus(val) {
       this.newStatus = val;
