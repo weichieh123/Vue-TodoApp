@@ -39,6 +39,30 @@ export default {
           completed: false,
           inProgress: true,
         },
+        {
+          id: 3,
+          title: "Go walking",
+          completed: false,
+          inProgress: true,
+        },
+        {
+          id: 4,
+          title: "Buy drinks",
+          completed: false,
+          inProgress: true,
+        },
+        {
+          id: 5,
+          title: "Clean house",
+          completed: false,
+          inProgress: true,
+        },
+        {
+          id: 6,
+          title: "Trip prepare",
+          completed: false,
+          inProgress: true,
+        },
       ],
     };
   },

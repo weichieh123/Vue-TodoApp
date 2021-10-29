@@ -29,7 +29,7 @@
       v-model="editedTitle"
     />
 
-    <h2 class="fit-content mx-auto mb-2">Hello! {{ userName }}</h2>
+    <h2 class="fit-content mx-auto mb-3">Hello! {{ userName }}</h2>
     <div class="col-12 d-flex align-items-center">
       <h2 class="d-inline">My tasks</h2>
 
@@ -73,9 +73,20 @@
         Add Task
       </button>
       <div class="input-group fit-content">
-        <input v-model="search" type="search" class="w-75 ml-3" placeholder="search task" @keyup.enter="searchTask" />
+        <input
+          v-model="search"
+          type="search"
+          class="w-75 ml-3"
+          placeholder="search task"
+          @keyup.enter="searchTask"
+        />
         <div class="form-outline"></div>
-        <button id="search-btn" type="button" class="btn btn-outline-info" @click="searchTask">
+        <button
+          id="search-btn"
+          type="button"
+          class="btn btn-outline-info"
+          @click="searchTask"
+        >
           <v-icon>mdi-magnify</v-icon>
         </button>
       </div>
@@ -105,6 +116,42 @@
         />
       </tbody>
     </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" id="pagination">
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <a
+            class="page-link"
+            href="#"
+            aria-label="Previous"
+            @click="changePage(-1)"
+          >
+            <!-- v-if="page !== 1" -->
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item" :key="index" v-for="(pageNo, index) in pages.slice(page + pageStart, page + 5)">
+          <a
+            class="page-link"
+            href="#"
+            @click="page = pageNo"
+            >{{ pageNo }}</a
+          >
+        </li>
+        <li class="page-item"
+          @click="changePage(+1)">
+          <a
+            class="page-link"
+            href="#"
+            aria-label="Next"
+          >
+            <!-- v-if="page < page.length" -->
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -120,7 +167,42 @@ export default {
       type: Array,
       default: function () {
         return [
-          { id: 1, title: "default task", completed: false, inProgress: false },
+          {
+          id: 1,
+          title: "Make todo list",
+          completed: false,
+          inProgress: false,
+        },
+        {
+          id: 2,
+          title: "Go skydiving",
+          completed: false,
+          inProgress: true,
+        },
+        {
+          id: 3,
+          title: "Go walking",
+          completed: false,
+          inProgress: true,
+        },
+        {
+          id: 4,
+          title: "Buy drinks",
+          completed: false,
+          inProgress: true,
+        },
+        {
+          id: 5,
+          title: "Clean house",
+          completed: false,
+          inProgress: true,
+        },
+        {
+          id: 6,
+          title: "Trip prepare",
+          completed: false,
+          inProgress: true,
+        },
         ];
       },
     },
@@ -132,30 +214,62 @@ export default {
       showAddModal: false,
       showEditModal: false,
       newTask: "",
-      newStatus: "todo", //child choose value to change
+      newStatus: "todo",
       editedTitle: "123",
       editedIndex: 333,
       editedStatus: "",
       filteredTasks: [...this.tasks],
       filteredStatus: "All",
-      myRef: "",
       search: "",
+      page: 1,
+      perPage: 2,
+      pages: [],
     };
   },
   methods: {
-    searchTask(){
-      this.filteredTasks = this.tasks.filter((task)=> task.title.toLowerCase().includes(this.search.toLowerCase()));
+    setPages() {
+      let numOfPages = Math.ceil(this.tasks.length / this.perPage);
+      for (let i = 1; i <= numOfPages; i++) {
+        this.pages.push(i);
+      }
     },
-    updateStatus(val){
+    paginate(tasks) {
+      let page = this.page;
+      let perPage = this.perPage;
+      let from = page * perPage - perPage;
+      let to = page * perPage;
+      return tasks.slice(from, to);
+    },
+    displayedTasks() {
+      this.filterTasks = this.paginate(this.tasks);
+      console.log('displayed:',this.filterTasks, this.paginate(this.tasks));
+    },
+    changePage(step){
+        this.page = this.page + step ;
+      if(this.page < 1) 
+        this.page = 1;
+      else if(this.page > this.pages[this.pages.length-1]) 
+        this.page = this.pages[this.pages.length-1];
+    },
+    pageStart(){
+      if(this.pages <=5 ){
+        return (-this.page)
+      } 
+      else {
+        return -1
+      } 
+    },
+    searchTask() {
+      this.filteredTasks = this.tasks.filter((task) =>
+        task.title.toLowerCase().includes(this.search.toLowerCase())
+      );
+    },
+    updateStatus(val) {
       this.newStatus = val;
       // console.log('parent updateStatus', this.newStatus, val)
-    }, 
-    // updateTask(editedVal) {
-    //   this.editedTitle = editedVal;
-    // },
+    },
     toggleAddModal() {
       this.showAddModal = !this.showAddModal;
-      this.myRef = "inputForAdd";
     },
     toggleEditModal() {
       this.showEditModal = !this.showEditModal;
@@ -166,8 +280,8 @@ export default {
           let idNum = 0;
           this.tasks.push({
             title: this.newTask,
-            inProgress: (this.newStatus==='todo' ? false : true),
-            completed: (this.newStatus==='completed' ? true : false),
+            inProgress: this.newStatus === "todo" ? false : true,
+            completed: this.newStatus === "completed" ? true : false,
             id: idNum + 1,
           });
           this.newTask = "";
@@ -176,8 +290,8 @@ export default {
           let idNum = this.tasks[this.tasks.length - 1].id;
           this.tasks.push({
             title: this.newTask,
-            inProgress: (this.newStatus==='todo' ? false : true),
-            completed: (this.newStatus==='completed' ? true : false),
+            inProgress: this.newStatus === "todo" ? false : true,
+            completed: this.newStatus === "completed" ? true : false,
             id: idNum + 1,
           });
           this.newTask = "";
@@ -188,8 +302,10 @@ export default {
     editTask(val) {
       if (val) {
         this.tasks[this.editedIndex].title = val;
-        this.tasks[this.editedIndex].inProgress = (this.newStatus==='todo' ? false : true);
-        this.tasks[this.editedIndex].completed = (this.newStatus==='completed' ? true : false);
+        this.tasks[this.editedIndex].inProgress =
+          this.newStatus === "todo" ? false : true;
+        this.tasks[this.editedIndex].completed =
+          this.newStatus === "completed" ? true : false;
       }
       this.showEditModal = !this.showEditModal;
     },
@@ -214,12 +330,9 @@ export default {
       */
       this.editedTitle = this.tasks[index].title;
       this.editedIndex = index;
-      if(this.tasks[index].completed)
-        this.editedStatus = "completed"
-      else if(!this.tasks[index].inProgress)
-        this.editedStatus = "todo"
-      else 
-        this.editedStatus = "inProgress"
+      if (this.tasks[index].completed) this.editedStatus = "completed";
+      else if (!this.tasks[index].inProgress) this.editedStatus = "todo";
+      else this.editedStatus = "inProgress";
       // console.log('editedTask',this.editedStatus)
     },
 
@@ -251,6 +364,9 @@ export default {
       }
     },
   },
+  computed: {
+    
+  },
   watch: {
     showAddModal: function () {
       this.$nextTick(function () {
@@ -265,10 +381,16 @@ export default {
     tasks: function () {
       this.filteredTasks = [...this.tasks];
       this.filteredStatus = "All";
+      this.displayedTasks();
     },
-    filteredTasks: function(){
+    filteredTasks: function () {
       this.search = "";
-    }
+    },
+  },
+  created() {
+    this.pages=[];
+    this.setPages();
+    this.displayedTasks();
   },
   components: {
     MyModal,
@@ -277,13 +399,17 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  input[type="search"] {
-    border-radius: 5px;
-    height: 38px;
-    outline: 1px solid #17a2b8;
-  }
-  #search-btn {
-    height: 38px;
-    margin: 5px 0;
-  }
+input[type="search"] {
+  border-radius: 5px;
+  height: 38px;
+  outline: 1px solid #17a2b8;
+}
+#search-btn {
+  height: 38px;
+  margin: 5px 0;
+}
+#pagination {
+  margin-top: 50px;
+  margin-bottom: 100px;
+}
 </style>
