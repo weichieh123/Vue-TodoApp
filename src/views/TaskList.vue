@@ -33,7 +33,8 @@
     <div class="col-12 d-flex align-items-center">
       <h2 class="d-inline">My tasks</h2>
 
-      <div class="dropdown d-inline ml-auto mr-3">
+      <!-- Filter Status  -->
+      <!-- <div class="dropdown d-inline ml-auto mr-3">
         <button
           id="fiterStatusBtn"
           class="btn btn-outline-info dropdown-toggle"
@@ -64,10 +65,10 @@
             >Completed</a
           >
         </div>
-      </div>
+      </div> -->
       <button
         type="button"
-        class="btn btn-outline-info"
+        class="btn btn-outline-info ml-auto"
         @click="toggleAddModal"
       >
         Add Task
@@ -336,10 +337,10 @@ export default {
         this.editedTitle => 要編輯的項目的title
         this.editedIndex => 要編輯的項目的index
       */
-      this.editedTitle = this.tasks[index].title;
-      this.editedIndex = index;
-      if (this.tasks[index].completed) this.editedStatus = "completed";
-      else if (!this.tasks[index].inProgress) this.editedStatus = "todo";
+      this.editedIndex = (this.page - 1) * this.perPage + index ;
+      this.editedTitle = this.tasks[this.editedIndex].title;
+      if (this.tasks[this.editedIndex].completed) this.editedStatus = "completed";
+      else if (!this.tasks[this.editedIndex].inProgress) this.editedStatus = "todo";
       else this.editedStatus = "inProgress";
       // console.log('editedTask',this.editedStatus)
     },
