@@ -8,11 +8,13 @@
       :title="'Add new task:'"
       :modalref="'inputForAdd'"
       :targetTask="newTask"
+      :targetStatus="newStatus"
+      @updateStatus="updateStatus"
       @toggle="toggleAddModal"
       @submit="addTask"
       v-model="newTask"
     />
-    
+
     <!-- Modal: Edit Task -->
     <MyModal
       v-show="showEditModal"
@@ -20,18 +22,21 @@
       :title="'Edit your task:'"
       :modalref="'inputForEdit'"
       :targetTask="editedTitle"
+      :targetStatus="editedStatus"
+      @updateStatus="updateStatus"
       @toggle="toggleEditModal"
       @submit="editTask"
       v-model="editedTitle"
     />
-    
+
     <h2 class="fit-content mx-auto mb-2">Hello! {{ userName }}</h2>
     <div class="col-12 d-flex align-items-center">
       <h2 class="d-inline">My tasks</h2>
+
       <div class="dropdown d-inline ml-auto mr-3">
         <button
           id="fiterStatusBtn"
-          class="btn btn-secondary dropdown-toggle"
+          class="btn btn-outline-info dropdown-toggle"
           type="button"
           data-toggle="dropdown"
           aria-haspopup="true"
@@ -67,6 +72,13 @@
       >
         Add Task
       </button>
+      <div class="input-group fit-content">
+        <input v-model="search" type="search" class="w-75 ml-3" placeholder="search task" @keyup.enter="searchTask" />
+        <div class="form-outline"></div>
+        <button id="search-btn" type="button" class="btn btn-outline-info" @click="searchTask">
+          <v-icon>mdi-magnify</v-icon>
+        </button>
+      </div>
     </div>
 
     <!-- Table -->
@@ -99,6 +111,7 @@
 <script>
 import MyModal from "../components/MyModal.vue";
 import TaskItem from "./TaskItem.vue";
+// import _ from 'lodash';
 
 export default {
   name: "TaskList",
@@ -113,24 +126,33 @@ export default {
     },
     userName: { type: String, default: "" },
   },
-  // props: ['tasks'],
 
   data() {
     return {
       showAddModal: false,
       showEditModal: false,
       newTask: "",
+      newStatus: "todo", //child choose value to change
       editedTitle: "123",
       editedIndex: 333,
+      editedStatus: "",
       filteredTasks: [...this.tasks],
       filteredStatus: "All",
       myRef: "",
+      search: "",
     };
   },
   methods: {
-    updateTask(editedVal) {
-      this.editedTitle = editedVal;
+    searchTask(){
+      this.filteredTasks = this.tasks.filter((task)=> task.title.toLowerCase().includes(this.search.toLowerCase()));
     },
+    updateStatus(val){
+      this.newStatus = val;
+      // console.log('parent updateStatus', this.newStatus, val)
+    }, 
+    // updateTask(editedVal) {
+    //   this.editedTitle = editedVal;
+    // },
     toggleAddModal() {
       this.showAddModal = !this.showAddModal;
       this.myRef = "inputForAdd";
@@ -144,8 +166,8 @@ export default {
           let idNum = 0;
           this.tasks.push({
             title: this.newTask,
-            completed: false,
-            inProgress: false,
+            inProgress: (this.newStatus==='todo' ? false : true),
+            completed: (this.newStatus==='completed' ? true : false),
             id: idNum + 1,
           });
           this.newTask = "";
@@ -154,8 +176,8 @@ export default {
           let idNum = this.tasks[this.tasks.length - 1].id;
           this.tasks.push({
             title: this.newTask,
-            completed: false,
-            inProgress: false,
+            inProgress: (this.newStatus==='todo' ? false : true),
+            completed: (this.newStatus==='completed' ? true : false),
             id: idNum + 1,
           });
           this.newTask = "";
@@ -166,6 +188,8 @@ export default {
     editTask(val) {
       if (val) {
         this.tasks[this.editedIndex].title = val;
+        this.tasks[this.editedIndex].inProgress = (this.newStatus==='todo' ? false : true);
+        this.tasks[this.editedIndex].completed = (this.newStatus==='completed' ? true : false);
       }
       this.showEditModal = !this.showEditModal;
     },
@@ -190,6 +214,13 @@ export default {
       */
       this.editedTitle = this.tasks[index].title;
       this.editedIndex = index;
+      if(this.tasks[index].completed)
+        this.editedStatus = "completed"
+      else if(!this.tasks[index].inProgress)
+        this.editedStatus = "todo"
+      else 
+        this.editedStatus = "inProgress"
+      // console.log('editedTask',this.editedStatus)
     },
 
     removeTask(index) {
@@ -235,6 +266,9 @@ export default {
       this.filteredTasks = [...this.tasks];
       this.filteredStatus = "All";
     },
+    filteredTasks: function(){
+      this.search = "";
+    }
   },
   components: {
     MyModal,
@@ -242,3 +276,14 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+  input[type="search"] {
+    border-radius: 5px;
+    height: 38px;
+    outline: 1px solid #17a2b8;
+  }
+  #search-btn {
+    height: 38px;
+    margin: 5px 0;
+  }
+</style>
