@@ -125,13 +125,14 @@
             class="page-link"
             href="#"
             aria-label="Previous"
-            @click="changePage(-1)"
+            @click="changePage(-1), displayTasks()"
           >
-            <!-- v-if="page !== 1" -->
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
-        <li class="page-item" :key="index" v-for="(pageNo, index) in pages.slice(page + pageStart, page + 5)">
+        <li :class="pageNo===page ? 'page-item active':'page-item'" 
+            :key="index" v-for="(pageNo, index) in pages.slice(page + pageStart, page + 5)"
+          @click="displayTasks()">
           <a
             class="page-link"
             href="#"
@@ -140,13 +141,12 @@
           >
         </li>
         <li class="page-item"
-          @click="changePage(+1)">
+          @click="changePage(+1), displayTasks()">
           <a
             class="page-link"
             href="#"
             aria-label="Next"
           >
-            <!-- v-if="page < page.length" -->
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
@@ -158,7 +158,6 @@
 <script>
 import MyModal from "../components/MyModal.vue";
 import TaskItem from "./TaskItem.vue";
-// import _ from 'lodash';
 
 export default {
   name: "TaskList",
@@ -218,7 +217,7 @@ export default {
       editedTitle: "123",
       editedIndex: 333,
       editedStatus: "",
-      filteredTasks: [...this.tasks],
+      filteredTasks: this.paginate(this.tasks),
       filteredStatus: "All",
       search: "",
       page: 1,
@@ -240,9 +239,9 @@ export default {
       let to = page * perPage;
       return tasks.slice(from, to);
     },
-    displayedTasks() {
-      this.filterTasks = this.paginate(this.tasks);
-      console.log('displayed:',this.filterTasks, this.paginate(this.tasks));
+    displayTasks() {
+      this.filteredTasks = this.paginate(this.tasks);
+      console.log('displayed:',this.filteredTasks, this.paginate(this.tasks));
     },
     changePage(step){
         this.page = this.page + step ;
@@ -365,7 +364,7 @@ export default {
     },
   },
   computed: {
-    
+   
   },
   watch: {
     showAddModal: function () {
@@ -381,7 +380,7 @@ export default {
     tasks: function () {
       this.filteredTasks = [...this.tasks];
       this.filteredStatus = "All";
-      this.displayedTasks();
+      this.displayTasks();
     },
     filteredTasks: function () {
       this.search = "";
@@ -390,7 +389,7 @@ export default {
   created() {
     this.pages=[];
     this.setPages();
-    this.displayedTasks();
+    this.displayTasks();
   },
   components: {
     MyModal,
