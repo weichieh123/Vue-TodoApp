@@ -105,7 +105,7 @@
       </thead>
       <tbody>
         <TaskItem
-          v-for="(task, index) in filteredTasks"
+          v-for="(task, index) in displayedTasks"
           @remove="removeTask(index)"
           @complete="completeTask(task)"
           @status="changeStatus(task)"
@@ -217,8 +217,9 @@ export default {
       editedTitle: "123",
       editedIndex: 333,
       editedStatus: "",
-      filteredTasks: this.paginate(this.tasks),
+      filteredTasks: [...this.tasks],
       filteredStatus: "All",
+      displayedTasks: this.paginate(this.tasks),
       search: "",
       page: 1,
       perPage: 2,
@@ -240,8 +241,8 @@ export default {
       return tasks.slice(from, to);
     },
     displayTasks() {
-      this.filteredTasks = this.paginate(this.tasks);
-      console.log('displayed:',this.filteredTasks, this.paginate(this.tasks));
+      this.displayedTasks = this.paginate(this.filteredTasks);
+      // console.log('displayed:',this.filteredTasks, this.paginate(this.tasks));
     },
     changePage(step){
         this.page = this.page + step ;
@@ -312,13 +313,19 @@ export default {
       if (!task.inProgress && !task.completed) {
         // change to inProgress
         task.inProgress = true;
+        this.filterTasks(this.filteredStatus);
+        this.displayTasks();
       } else if (task.inProgress && !task.completed) {
         // change to Completed
         task.completed = true;
+        this.filterTasks(this.filteredStatus);
+        this.displayTasks();
       } else if (task.inProgress && task.completed) {
         // change to ToDo
         task.completed = false;
         task.inProgress = false;
+        this.filterTasks(this.filteredStatus);
+        this.displayTasks();
       }
     },
 
@@ -346,25 +353,26 @@ export default {
         case "todo":
           this.filteredTasks = this.tasks.filter((task) => !task.inProgress);
           this.filteredStatus = "Todo";
+          this.displayTasks();
           break;
         case "inProgress":
           this.filteredTasks = this.tasks.filter(
             (task) => task.inProgress && !task.completed
           );
           this.filteredStatus = "in Progress";
+          this.displayTasks();
           break;
         case "completed":
           this.filteredTasks = this.tasks.filter((task) => task.completed);
           this.filteredStatus = "Completed";
+          this.displayTasks();
           break;
         default:
           this.filteredTasks = [...this.tasks];
           this.filteredStatus = "All";
+          this.displayTasks();
       }
     },
-  },
-  computed: {
-   
   },
   watch: {
     showAddModal: function () {
@@ -384,10 +392,12 @@ export default {
     },
     filteredTasks: function () {
       this.search = "";
+      this.page = 1; 
+      this.displayTasks();
     },
   },
   created() {
-    this.pages=[];
+    this.pages = [];
     this.setPages();
     this.displayTasks();
   },
