@@ -132,7 +132,7 @@
           </a>
         </li>
         <li :class="pageNo===page ? 'page-item active':'page-item'" 
-            :key="index" v-for="(pageNo, index) in pages.slice(page + pageStart, page + 5)"
+            :key="index" v-for="(pageNo, index) in pages.slice( pageStart, pageStart + 4)"
           @click="displayTasks()">
           <a
             class="page-link"
@@ -252,14 +252,6 @@ export default {
         this.page = 1;
       else if(this.page > this.pages[this.pages.length-1]) 
         this.page = this.pages[this.pages.length-1];
-    },
-    pageStart(){
-      if(this.pages <=5 ){
-        return (-this.page)
-      } 
-      else {
-        return -1
-      } 
     },
     searchTask() {
       this.filteredTasks = this.tasks.filter((task) =>
@@ -381,6 +373,27 @@ export default {
       }
     },
   },
+  computed: {
+    pageStart(){
+      let pageLimit = 5;
+      let totalPages = this.pages.length;
+      if(totalPages<=pageLimit){
+        // 如果總頁數<=5，直接顯示所有頁碼
+        return 0;
+      }
+      else {
+        // 總頁數>5，到最後5頁會停止改變頁碼顯示
+        if(this.page <= this.pages.length - pageLimit + 1 ){
+          console.log('<=',this.page - 1)
+          return this.page - 1;
+        } 
+        else {
+          console.log('>',this.page, this.pages.length, this.pages.length - pageLimit + 1)
+          return this.pages.length - pageLimit + 1
+        } 
+      }
+    },
+  },
   watch: {
     showAddModal: function () {
       this.$nextTick(function () {
@@ -395,6 +408,7 @@ export default {
     tasks: function () {
       this.filteredTasks = [...this.tasks];
       this.filteredStatus = "All";
+      this.setPages(this.tasks);
       this.displayTasks();
     },
     filteredTasks: function () {
