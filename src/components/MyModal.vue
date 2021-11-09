@@ -1,107 +1,133 @@
 <template id="MyModal">
   <div class="modal-mask">
     <div class="modal-container" @click.self="$emit('toggle')">
-        <div class="modal-header">{{title}}</div>
-        <div class="modal-body">
-          <div class="col-12 d-flex align-items-center justify-content-between">
-            <input
-              type="text"
-              :ref="modalref"
-              v-bind:value="this.targetTask"
-              v-on:input="updateTask($event.target.value)"           
-              @keyup.enter="$emit('submit',submitTarget($event))"
-              placeholder="What you want to do?"
-            />
-            <div class="dropdown d-inline">
-              <button
-                id="nowStatusBtn"
-                class="btn btn-outline-info dropdown-toggle ml-1"
-                type="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
+      <div class="modal-header">{{ title }}</div>
+      <div class="modal-body">
+        <div class="col-12 d-flex align-items-center justify-content-between">
+          <!-- @keyup.enter="$emit('updateStatus', nowStatus), $emit('submit', submitTarget())" -->
+          <input
+            type="text"
+            :ref="modalref"
+            v-bind:value="this.targetTask"
+            v-on:input="updateTask($event.target.value)"
+            placeholder="What you want to do?"
+          />
+          <div class="dropdown d-inline">
+            <button
+              id="nowStatusBtn"
+              class="btn btn-outline-info dropdown-toggle ml-1"
+              type="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              {{ this.nowStatus }}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="fiterStatusBtn">
+              <a
+                class="dropdown-item"
+                value="todo"
+                @click="changeNowStatus('todo')"
+                >Todo</a
               >
-                {{this.nowStatus}}
-              </button>
-              <div class="dropdown-menu" aria-labelledby="fiterStatusBtn">
-                <a
-                  class="dropdown-item"
-                  value="todo"
-                  @click="updateStatus('todo')"
-                  >Todo</a
-                >
-                <a
-                  class="dropdown-item"
-                  value="inProgress"
-                  @click="updateStatus('inProgress')"
-                  >in Progress</a
-                >
-                <a
-                  class="dropdown-item"
-                  value="completed"
-                  @click="updateStatus('completed')"
-                  >Completed</a
-                >
-              </div>
+              <a
+                class="dropdown-item"
+                value="inProgress"
+                @click="changeNowStatus('inProgress')"
+                >in Progress</a
+              >
+              <a
+                class="dropdown-item"
+                value="completed"
+                @click="changeNowStatus('completed')"
+                >Completed</a
+              >
             </div>
           </div>
-          <div class="col-12">
-            <small class="w-100">press 'enter' to submit your task</small>
-          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="col-12 d-flex">
+          <button
+            ref="submit"
+            type="button"
+            class="btn btn-info w-25 ml-auto mr-3 text-light fit-content"
+            @click="clickHandler"
+          >
+            Submit
+          </button>
+          <!-- @keyup.enter="this.$refs.submit.click()" -->
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "MyModal",
-  props: ["title", "modalref", "targetTask", "targetStatus", "editedTitle", "editedIndex"],
-  data(){
+  props: [
+    "title",
+    "modalref",
+    "targetTask",
+    "targetStatus", //newStatus & editedStatus
+    "editedTitle",
+    "editedIndex",
+  ],
+  data() {
     return {
-      nowStatus: this.targetStatus
-    }
+      nowStatus: this.targetStatus,
+    };
   },
   methods: {
-    updateTask(val){
-      if(this.modalref==='inputForAdd')
-        this.$emit('input', val);
-      else (this.modalref==='inputForEdit')
-        this.$emit('updateTask', val);
+    clickHandler() {
+      // $emit('updateStatus', nowStatus), $emit('submit', submitTarget())
+      this.$emit("updateStatus", this.nowStatus);
+      this.$emit("submit", this.submitTarget());
     },
-    updateStatus(val){
-      if(this.modalref==='inputForAdd'){
-        this.$emit('updateStatus', val);
-        this.nowStatus = val
-        // console.log('updateStatus', val, this.nowStatus, this.targetStatus)
+    updateTask(val) {
+      if (this.modalref === "inputForAdd") {
+        this.$emit("input", val);
+      } else if (this.modalref === "inputForEdit") {
+        this.$emit("updateTask", val);
       }
-      else (this.modalref==='inputForEdit')
-        this.$emit('updateStatus', val);
-        this.nowStatus = val
-        // console.log('modal status', this.targetStatus, this.nowStatus)
     },
-    submitTarget(event){
-      if(this.modalref==='inputForAdd')
+    changeNowStatus(val) {
+      this.nowStatus = val;
+    },
+    submitTarget() {
+      if (this.modalref === "inputForAdd") {
         return "";
-      else (this.modalref==='inputForEdit')
-        return event.target.value
-    }
+      } else if (this.modalref === "inputForEdit") {
+        return this.$refs.inputForEdit.value;
+      }
+    },
   },
   watch: {
-    targetStatus: function(){
-      this.nowStatus = this.targetStatus
-    }
+    targetStatus: function () {
+      // console.log('targetStatus', this.targetStatus)
+      this.nowStatus = this.targetStatus;
+    },
   },
-}
+  mounted() {
+    this.nowStatus = this.targetStatus;
+    // console.log('mounted')
+  },
+  // updated() {
+  //   console.log('updated')
+  // },
+  // destroyed() {
+  //   console.log('destroyed')
+  // }
+};
 </script>
 <style lang="scss" scoped>
-  input[type="text"] {
-    width: 340px;
-  }
-  #nowStatusBtn {
-    height: 40px;
-    width: 120px;
-    // margin: 5px 0;
-  }
+input[type="text"] {
+  width: 340px;
+}
+#nowStatusBtn {
+  height: 40px;
+  width: 120px;
+  // margin: 5px 0;
+}
 </style>

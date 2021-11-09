@@ -3,7 +3,7 @@
   <div class="container mx-auto">
     <!-- Modal: Add Task -->
     <MyModal
-      v-show="showAddModal"
+      v-if="showAddModal"
       ref="AddModal"
       :title="'Add new task:'"
       :modalref="'inputForAdd'"
@@ -17,7 +17,7 @@
 
     <!-- Modal: Edit Task -->
     <MyModal
-      v-show="showEditModal"
+      v-if="showEditModal"
       ref="EditModal"
       :title="'Edit your task:'"
       :modalref="'inputForEdit'"
@@ -131,23 +131,16 @@
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
-        <li :class="pageNo===page ? 'page-item active':'page-item'" 
-            :key="index" v-for="(pageNo, index) in pages.slice( pageStart, pageStart + 4)"
-          @click="displayTasks()">
-          <a
-            class="page-link"
-            href="#"
-            @click="page = pageNo"
-            >{{ pageNo }}</a
-          >
+        <li
+          :class="pageNo === page ? 'page-item active' : 'page-item'"
+          :key="index"
+          v-for="(pageNo, index) in pages.slice(pageStart, pageStart + 5)"
+          @click="displayTasks()"
+        >
+          <a class="page-link" href="#" @click="page = pageNo">{{ pageNo }}</a>
         </li>
-        <li class="page-item"
-          @click="changePage(+1), displayTasks()">
-          <a
-            class="page-link"
-            href="#"
-            aria-label="Next"
-          >
+        <li class="page-item" @click="changePage(+1), displayTasks()">
+          <a class="page-link" href="#" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
@@ -170,38 +163,32 @@ export default {
           {
           id: 1,
           title: "Make todo list",
-          completed: false,
-          inProgress: false,
+          status: 'todo',
         },
         {
           id: 2,
           title: "Go skydiving",
-          completed: false,
-          inProgress: true,
+          status: 'inProgress',
         },
         {
           id: 3,
           title: "Go walking",
-          completed: false,
-          inProgress: true,
+          status: 'completed',
         },
         {
           id: 4,
           title: "Buy drinks",
-          completed: false,
-          inProgress: true,
+          status: 'inProgress',
         },
         {
           id: 5,
           title: "Clean house",
-          completed: false,
-          inProgress: true,
+          status: 'inProgress',
         },
         {
           id: 6,
           title: "Trip prepare",
-          completed: false,
-          inProgress: true,
+          status: 'inProgress',
         },
         ];
       },
@@ -223,7 +210,7 @@ export default {
       displayedTasks: this.paginate(this.tasks),
       search: "",
       page: 1,
-      perPage: 2,
+      perPage: 4,
       pages: [],
     };
   },
@@ -246,12 +233,11 @@ export default {
       this.displayedTasks = this.paginate(this.filteredTasks);
       // console.log('displayed:',this.filteredTasks, this.paginate(this.tasks));
     },
-    changePage(step){
-        this.page = this.page + step ;
-      if(this.page < 1) 
-        this.page = 1;
-      else if(this.page > this.pages[this.pages.length-1]) 
-        this.page = this.pages[this.pages.length-1];
+    changePage(step) {
+      this.page = this.page + step;
+      if (this.page < 1) this.page = 1;
+      else if (this.page > this.pages[this.pages.length - 1])
+        this.page = this.pages[this.pages.length - 1];
     },
     searchTask() {
       this.filteredTasks = this.tasks.filter((task) =>
@@ -265,6 +251,7 @@ export default {
     },
     toggleAddModal() {
       this.showAddModal = !this.showAddModal;
+      this.newStatus = 'todo'
     },
     toggleEditModal() {
       this.showEditModal = !this.showEditModal;
@@ -275,52 +262,49 @@ export default {
           let idNum = 0;
           this.tasks.push({
             title: this.newTask,
-            inProgress: this.newStatus === "todo" ? false : true,
-            completed: this.newStatus === "completed" ? true : false,
+            status: this.newStatus,
             id: idNum + 1,
           });
           this.newTask = "";
+          this.newStatus = "todo";
           this.showAddModal = !this.showAddModal;
         } else {
           let idNum = this.tasks[this.tasks.length - 1].id;
           this.tasks.push({
             title: this.newTask,
-            inProgress: this.newStatus === "todo" ? false : true,
-            completed: this.newStatus === "completed" ? true : false,
+            status: this.newStatus,
             id: idNum + 1,
           });
           this.newTask = "";
+          this.newStatus = "todo";
           this.showAddModal = !this.showAddModal;
         }
       }
     },
     editTask(val) {
       if (val) {
+        if(this.newStatus==='' ) {
+          this.newStatus = this.tasks[this.editedIndex].status;
+        }
+        // console.log(this.tasks[this.editedIndex].inProgress,this.tasks[this.editedIndex].completed, this.newStatus)
         this.tasks[this.editedIndex].title = val;
-        this.tasks[this.editedIndex].inProgress =
-          this.newStatus === "todo" ? false : true;
-        this.tasks[this.editedIndex].completed =
-          this.newStatus === "completed" ? true : false;
+        this.tasks[this.editedIndex].status = this.newStatus;
       }
       this.showEditModal = !this.showEditModal;
+      this.newStatus = "";
     },
     changeStatus(task) {
-      if (!task.inProgress && !task.completed) {
+      if(task.status==='todo'){
         // change to inProgress
-        task.inProgress = true;
-        this.filterTasks(this.filteredStatus);
-        this.displayTasks();
-      } else if (task.inProgress && !task.completed) {
+        task.status = 'inProgress';
+      }
+      else if(task.status==='inProgress'){
         // change to Completed
-        task.completed = true;
-        this.filterTasks(this.filteredStatus);
-        this.displayTasks();
-      } else if (task.inProgress && task.completed) {
-        // change to ToDo
-        task.completed = false;
-        task.inProgress = false;
-        this.filterTasks(this.filteredStatus);
-        this.displayTasks();
+        task.status = 'completed';
+      }
+      else if(task.status==='completed'){
+        // change to todo
+        task.status = 'todo';
       }
     },
 
@@ -329,81 +313,87 @@ export default {
         this.editedTitle => 要編輯的項目的title
         this.editedIndex => 要編輯的項目的index
       */
-      this.editedIndex = (this.page - 1) * this.perPage + index ;
+      this.editedIndex = (this.page - 1) * this.perPage + index;
       this.editedTitle = this.tasks[this.editedIndex].title;
-      if (this.tasks[this.editedIndex].completed) this.editedStatus = "completed";
-      else if (!this.tasks[this.editedIndex].inProgress) this.editedStatus = "todo";
-      else this.editedStatus = "inProgress";
+      this.editedStatus = this.tasks[this.editedIndex].status;
       // console.log('editedTask',this.editedStatus)
     },
 
     removeTask(index) {
-      this.tasks.splice(index, 1);
+      let removeIndex = (this.page - 1) * this.perPage + index;
+      this.tasks.splice(removeIndex, 1);
     },
-    clearCompleted() {
-      this.tasks = this.tasks.filter(this.inProgress);
-    },
-    filterTasks(status) {
-      switch (status) {
-        case "todo":
-          this.filteredTasks = this.tasks.filter((task) => !task.inProgress);
-          this.filteredStatus = "Todo";
-          this.setPages(this.filteredTasks);
-          this.displayTasks();
-          break;
-        case "inProgress":
-          this.filteredTasks = this.tasks.filter(
-            (task) => task.inProgress && !task.completed
-          );
-          this.filteredStatus = "in Progress";
-          this.setPages(this.filteredTasks);
-          this.displayTasks();
-          break;
-        case "completed":
-          this.filteredTasks = this.tasks.filter((task) => task.completed);
-          this.filteredStatus = "Completed";
-          this.setPages(this.filteredTasks);
-          this.displayTasks();
-          break;
-        default:
-          this.filteredTasks = [...this.tasks];
-          this.filteredStatus = "All";
-          this.setPages(this.filteredTasks);
-          this.displayTasks();
-      }
-    },
+    // clearCompleted() {
+    //   this.tasks = this.tasks.filter(this.inProgress);
+    // },
+    // filterTasks(status) {
+    //   switch (status) {
+    //     case "todo":
+    //       this.filteredTasks = this.tasks.filter((task) => !task.inProgress);
+    //       this.filteredStatus = "Todo";
+    //       this.setPages(this.filteredTasks);
+    //       this.displayTasks();
+    //       break;
+    //     case "inProgress":
+    //       this.filteredTasks = this.tasks.filter(
+    //         (task) => task.inProgress && !task.completed
+    //       );
+    //       this.filteredStatus = "in Progress";
+    //       this.setPages(this.filteredTasks);
+    //       this.displayTasks();
+    //       break;
+    //     case "completed":
+    //       this.filteredTasks = this.tasks.filter((task) => task.completed);
+    //       this.filteredStatus = "Completed";
+    //       this.setPages(this.filteredTasks);
+    //       this.displayTasks();
+    //       break;
+    //     default:
+    //       this.filteredTasks = [...this.tasks];
+    //       this.filteredStatus = "All";
+    //       this.setPages(this.filteredTasks);
+    //       this.displayTasks();
+    //   }
+    // },
   },
   computed: {
-    pageStart(){
+    pageStart() {
       let pageLimit = 5;
       let totalPages = this.pages.length;
-      if(totalPages<=pageLimit){
+      if (totalPages <= pageLimit) {
         // 如果總頁數<=5，直接顯示所有頁碼
         return 0;
-      }
-      else {
+      } else {
         // 總頁數>5，到最後5頁會停止改變頁碼顯示
-        if(this.page <= this.pages.length - pageLimit + 1 ){
-          console.log('<=',this.page - 1)
+        if (this.page <= this.pages.length - pageLimit + 1) {
+          // console.log("<=", this.page - 1);
           return this.page - 1;
-        } 
-        else {
-          console.log('>',this.page, this.pages.length, this.pages.length - pageLimit + 1)
-          return this.pages.length - pageLimit + 1
-        } 
+        } else {
+          // console.log(
+          //   ">",
+          //   this.page,
+          //   this.pages.length,
+          //   this.pages.length - pageLimit + 1
+          // );
+          return this.pages.length - pageLimit + 1;
+        }
       }
     },
   },
   watch: {
     showAddModal: function () {
-      this.$nextTick(function () {
-        this.$refs.AddModal.$refs.inputForAdd.focus();
-      });
+      if(this.showAddModal) {
+        this.$nextTick(function () {
+          this.$refs.AddModal.$refs.inputForAdd.focus();
+        });
+      }
     },
     showEditModal: function () {
-      this.$nextTick(function () {
-        this.$refs.EditModal.$refs.inputForEdit.focus();
-      });
+      if(this.showEditModal) {
+        this.$nextTick(function () {
+          this.$refs.EditModal.$refs.inputForEdit.focus();
+        });
+      }
     },
     tasks: function () {
       this.filteredTasks = [...this.tasks];
@@ -412,8 +402,8 @@ export default {
       this.displayTasks();
     },
     filteredTasks: function () {
-      this.search = "";
-      this.page = 1; 
+      // this.search = "";
+      this.page = 1;
       this.displayTasks();
     },
   },

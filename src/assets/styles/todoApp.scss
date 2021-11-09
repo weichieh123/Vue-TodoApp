@@ -1,108 +1,119 @@
 .container {
-    min-height: 80vh;
-    margin-top: 50px;
+  min-height: 80vh;
+  margin-top: 50px;
+}
+.modal-mask {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: table;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
+}
+
+.modal-container {
+  cursor: pointer;
+  display: table-cell;
+  vertical-align: middle;
+}
+.modal-header {
+  cursor: auto;
+  display: block;
+  width: 50%;
+  min-width: 470px;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 1rem;
+  border-bottom: 1px solid #17a2b8;
+  background-color: #fff;
+  font-size: 2rem;
+  color: #17a2b8;
+  text-align: center;
+}
+.modal-body {
+  cursor: auto;
+  display: block;
+  width: 50%;
+  min-width: 470px;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  background-color: #fff;
+}
+.modal-footer {
+  cursor: auto;
+  display: block;
+  width: 50%;
+  min-width: 470px;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0.6rem;
+  background-color: #fff;
+  // border-top: 1px solid #17a2b8;
+}
+input {
+  height: 40px;
+  padding: 2px 15px;
+  width: 100%;
+  margin: 5px 0;
+  outline: 1px solid rgb(93, 136, 165);
+  color: #666;
+  &:focus-visible {
+    outline: 1px solid rgb(93, 136, 165);
   }
-  .modal-mask {
-    position: absolute;
-    z-index: 10;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: table;
-    background-color: rgba(0, 0, 0, 0.5);
-    transition: opacity 0.3s ease;
+}
+small {
+  padding: 0 15px;
+  color: #ccc;
+}
+.edit-btn.v-btn.v-btn--has-bg {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #17a2b8;
+  color: #17a2b8;
+  box-shadow: none;
+}
+.del-btn.v-btn.v-btn--has-bg {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #bbb;
+  color: #bbb;
+  box-shadow: none;
+  &:hover {
+    border: 1px solid rgb(233, 91, 91);
+    color: rgb(240, 152, 152);
   }
-  
-  .modal-container {
-    cursor: pointer;
-    display: table-cell;
+}
+.table {
+  th:not(:first-child) {
+    text-align: center;
+  }
+  td {
     vertical-align: middle;
+    &:not(:first-child) {
+      text-align: center;
+    }
   }
-  .modal-header {
+}
+.named {
+  .named-title {
     cursor: auto;
     display: block;
     width: 50%;
-    min-width: 470px;
-    max-width: 540px;
     margin: 0 auto;
     padding: 1rem;
-    border-bottom: 1px solid #17a2b8;
     background-color: #fff;
     font-size: 2rem;
     color: #17a2b8;
     text-align: center;
   }
-  .modal-body {
-    cursor: auto;
-    display: block;
-    width: 50%;
-    min-width: 470px;
-    max-width: 540px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #fff;
-  }
-  input {
+  .btn {
     height: 40px;
-    padding: 2px 15px;
-    width: 100%;
-    margin: 5px 0;
-    outline: 1px solid rgb(93, 136, 165);
-    color: #666;
-    &:focus-visible {
-      outline: 1px solid rgb(93, 136, 165);
-    }
+    width: 100px;
   }
-  small {
-    padding: 0 15px;
-    color: #ccc;
-  }
-  .edit-btn.v-btn.v-btn--has-bg {
-    background-color: rgb(255, 255, 255);
-    border: 1px solid #17a2b8;
-    color: #17a2b8;
-    box-shadow: none;
-  }
-  .del-btn.v-btn.v-btn--has-bg {
-    background-color: rgb(255, 255, 255);
-    border: 1px solid #bbb;
-    color: #bbb;
-    box-shadow: none;
-    &:hover {
-      border: 1px solid rgb(233, 91, 91);
-      color: rgb(240, 152, 152);
-    }
-  }
-  .table {
-    th:not(:first-child) {
-      text-align: center;
-    }
-    td {
-      vertical-align: middle;
-      &:not(:first-child) {
-        text-align: center;
-      }
-    }
-  }
-  .named {
-    .named-title {
-      cursor: auto;
-      display: block;
-      width: 50%;
-      margin: 0 auto;
-      padding: 1rem;
-      background-color: #fff;
-      font-size: 2rem;
-      color: #17a2b8;
-      text-align: center;
-    }
-    .btn {
-      height: 40px;
-      width: 100px;
-    }
-  }
-  
-  .fit-content {
-    width: fit-content;
-  }
+}
+
+.fit-content {
+  width: fit-content;
+}

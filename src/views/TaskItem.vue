@@ -4,19 +4,19 @@
     <td>{{task.title}}</td>
     <td>
       <button
-        v-if="!task.inProgress && !task.completed"
+        v-if="task.status==='todo'"
         type="button"
         :class="className"
         @click.self="$emit('status')"
       >Todo</button>
       <button
-        v-else-if="task.inProgress && !task.completed"
+        v-else-if="task.status==='inProgress'"
         type="button"
         :class="className"
         @click.self="$emit('status')"
       >in Progress</button>
       <button
-        v-else-if="task.inProgress && task.completed"
+        v-else-if="task.status==='completed'"
         type="button"
         :class="className"
         @click.self="$emit('status')"
@@ -43,16 +43,13 @@ export default {
   computed: {
     className() {
       let classes = ["btn"];
-      if (!this.task.inProgress && !this.task.completed) {
-        // Todo
+      if(this.task.status==='todo'){
         classes.push("btn-outline-dark");
       }
-      if (this.task.inProgress && !this.task.completed) {
-        // in Progress
+      else if(this.task.status==='inProgress'){
         classes.push("btn-outline-warning");
       }
-      if (this.task.inProgress && this.task.completed) {
-        // Completed
+      else if(this.task.status==='completed'){
         classes.push("btn-outline-success");
       }
       return classes.join(" ");
